@@ -1,0 +1,20 @@
+[
+  {
+    "id": "warehouse",
+    "title": "Warehouse associate · Romulus",
+    "text": "Riverline Logistics (fictional) is hiring Warehouse Associates!\nLocation: Van Born Rd & Middlebelt Rd, Romulus, MI\n2nd shift: 3:00 PM - 11:30 PM, Monday through Friday. Rotating Saturdays during peak season.\n$19/hr + shift differential. Must be able to lift 50 lbs. Reliable transportation required.",
+    "fallback_site": {"lat": 42.2654, "lon": -83.3363, "label": "Van Born Rd & Middlebelt Rd, Romulus (approx.)"}
+  },
+  {
+    "id": "hospital",
+    "title": "Food service · Midtown Detroit",
+    "text": "Now hiring: Food Service Worker, evening team at a Midtown Detroit medical campus (fictional employer).\nWhere: Woodward Ave & Mack Ave, Detroit MI\nHours 2pm to 10:30pm, five days a week including some weekends. Paid training, benefits after 60 days.",
+    "fallback_site": {"lat": 42.3486, "lon": -83.0567, "label": "Woodward Ave & Mack Ave, Detroit (approx.)"}
+  },
+  {
+    "id": "supplier",
+    "title": "Assembly operator · Sterling Heights",
+    "text": "Assembly Operator - Tier 2 auto supplier (fictional), Sterling Heights.\nAddress: Mound Rd & 17 Mile Rd, Sterling Heights, MI\nFirst shift 6:00am-2:30pm or second shift 2:30pm-11:00pm, Mon-Fri. Mandatory overtime as needed. No experience required.",
+    "fallback_site": {"lat": 42.5605, "lon": -83.0376, "label": "Mound Rd & 17 Mile Rd, Sterling Heights (approx.)"}
+  }
+]

@@ -1,0 +1,13 @@
+# secrets
+.env
+*.apikey
+apikey*.json
+# data (rebuilt from public sources by scripts/)
+data/raw/
+data/build/
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.DS_Store

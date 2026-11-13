@@ -1,0 +1,6 @@
+# Keep Bob's context small (saves Bobcoins) and keep secrets out of it
+.env
+data/raw/
+data/build/
+.venv/
+__pycache__/

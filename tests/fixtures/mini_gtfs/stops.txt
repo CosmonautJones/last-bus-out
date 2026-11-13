@@ -1,0 +1,4 @@
+stop_id,stop_name,stop_lat,stop_lon
+S,Site Stop,42.3305,-83.0500
+A,Stop A,42.4005,-83.1000
+B,Stop B,42.4505,-83.1500

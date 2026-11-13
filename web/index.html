@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Last Bus Out</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside id="panel">
+    <header>
+      <h1>Last Bus Out</h1>
+      <p class="tag">Can workers without a car get to this shift — and home again?</p>
+    </header>
+
+    <section>
+      <label for="posting">Paste a job posting</label>
+      <textarea id="posting" rows="7" placeholder="Paste the job posting here…"></textarea>
+      <div class="samples" id="samples"></div>
+      <button id="go" class="primary">Check this shift</button>
+      <p id="status" class="muted"></p>
+    </section>
+
+    <section id="parsed" hidden>
+      <div class="row between">
+        <h2>What Granite read</h2>
+        <button id="rawToggle" class="link">raw JSON</button>
+      </div>
+      <dl id="fields"></dl>
+      <pre id="raw" hidden></pre>
+      <p id="provider" class="badge"></p>
+    </section>
+
+    <section id="controls" hidden>
+      <div class="row between">
+        <label>Shift</label>
+        <select id="dayType">
+          <option value="weekday">Weekday</option>
+          <option value="saturday">Saturday</option>
+          <option value="sunday">Sunday</option>
+        </select>
+      </div>
+      <div class="slider">
+        <span>Start <b id="startLabel"></b></span>
+        <input type="range" id="start" min="0" max="1425" step="15" />
+      </div>
+      <div class="slider">
+        <span>End <b id="endLabel"></b></span>
+        <input type="range" id="end" min="0" max="2040" step="15" />
+      </div>
+    </section>
+
+    <section id="result" hidden>
+      <div class="big"><span id="pct">–</span><small>of car-free households in the region can make the round trip</small></div>
+      <ul class="legend">
+        <li><i class="g"></i><span id="nGreen">0</span> households: bus there <b>and</b> home</li>
+        <li><i class="a"></i><span id="nAmber">0</span> households: bus there, <b>no bus home</b></li>
+        <li><i class="n"></i>no one-seat bus ride</li>
+      </ul>
+      <div id="memoBox">
+        <h2>Memo for the employer</h2>
+        <p id="memo" class="memo"></p>
+        <p id="memoMeta" class="muted"></p>
+      </div>
+    </section>
+
+    <footer>
+      <span id="version"></span> · <span id="dataInfo"></span><br />
+      Scheduled times, not live: DDOT ran on time about two-thirds of weekday afternoons in 2025, so treat tight margins as risky.
+      One-seat rides only (transfers not yet modeled), ≤0.5 mi walk each end. Data: DDOT &amp; SMART GTFS, Census ACS B25044.
+    </footer>
+  </aside>
+  <main id="map"></main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
