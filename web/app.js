@@ -275,6 +275,7 @@ async function loadReach() {
     "No bus stops within a half-mile walk of this site.");
   render();
   debounceMemo();
+  $("controls").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 let memoTimer;

@@ -1,4 +1,4 @@
-# Last Bus Out · v0.1.0
+# Last Bus Out · v0.1.3
 
 **Can workers without a car get to this shift, and home again?**
 
@@ -9,7 +9,9 @@ deterministic engine checks every scheduled DDOT and SMART bus and colors the De
 - 🟠 **amber**: you can get there, but **no bus home** within 45 minutes of the shift ending
 - ⚪ **grey**: no one-seat bus ride
 
-Drag the shift-end slider and watch the map change. Granite then writes a three-sentence memo
+Drag the shift-end slider and watch the map change. A "Last bus home" line shows the last scheduled
+bus and how many minutes before or after the shift it leaves. Postings with two shifts get a
+1st/2nd shift switch and a side-by-side coverage line. Granite then writes a three-sentence memo
 for the employer. Every number in that memo is checked against the schedule data, and if Granite
 invents one, the memo is rejected and replaced with a template.
 
@@ -69,12 +71,15 @@ Sample job postings in `samples/` are **fictional**. No personal information is 
 
 - **IBM Bob IDE**: core build tool (see `BOB_PLAYBOOK.md` and `bob_usage/`)
 - **IBM watsonx.ai + IBM Granite**: posting extraction and employer memo
-- **IBM Code Engine**: deployment target (`Dockerfile`)
-- Claude (Anthropic) was used for research and the initial scaffold
-- Leaflet + CARTO/OpenStreetMap basemap
+- **IBM Code Engine**: optional deployment target (`Dockerfile`); not deployed for the demo
+- Claude (Anthropic) was used for research, the initial scaffold, and the v0.1.2 front-end polish
+  (shift switch, last-bus line, styling), reviewed and tested before commit
+- Leaflet + Esri World Light Gray basemap
 
 ## Limitations (we say these out loud)
 
+- The DDOT feed used is the weekday schedule from July 2026 (the newest copy we could download
+  automatically); the SMART feed is current (November 2026). The footer shows both dates.
 - Scheduled times, not live arrivals. DDOT reliability means tight margins are risky.
 - One-seat rides only; tract centroids approximate where people live; ACS estimates have margins of error.
 - Weekend modeling uses one representative Saturday and Sunday from each feed.
