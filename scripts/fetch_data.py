@@ -28,13 +28,13 @@ from app.config import COUNTY_FIPS, RAW_DIR, STATE_FIPS  # noqa: E402
 ACS_YEAR = os.getenv("LBO_ACS_YEAR", "2023")
 TIGER_YEAR = os.getenv("LBO_TIGER_YEAR", "2023")
 
-# DDOT: city portal (detroitmi.gov) blocks automated downloads with 403.
-# Primary fallback is the MobilityDatabase GCS hosted copy (MDB source ID 464, public).
+# DDOT GTFS must be downloaded manually in a browser — the city portal (detroitmi.gov)
+# blocks all automated/scripted requests with 403 Forbidden.
+# Download URL: https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip
+# Save it as data/raw/ddot_gtfs.zip. This script will never overwrite an existing ddot_gtfs.zip.
+DDOT_MANUAL = "ddot_gtfs.zip"
+
 DOWNLOADS = {
-    "ddot_gtfs.zip": (
-        "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/"
-        "us-michigan-detroit-department-of-transportation-ddot-gtfs-464.zip?alt=media"
-    ),
     "smart_gtfs.zip": "https://apps1.smartbus.org/gtfs/smart_gtfs.zip",
     "mi_tracts.zip": f"https://www2.census.gov/geo/tiger/GENZ{TIGER_YEAR}/shp/cb_{TIGER_YEAR}_{STATE_FIPS}_tract_500k.zip",
 }
@@ -91,6 +91,14 @@ def fetch_acs() -> None:
 if __name__ == "__main__":
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     print(f"Downloading into {RAW_DIR}")
+    # DDOT: manual download only — never overwrite
+    ddot_path = RAW_DIR / DDOT_MANUAL
+    if ddot_path.exists() and ddot_path.stat().st_size > 0:
+        print(f"  skip {DDOT_MANUAL} (manual file present, {ddot_path.stat().st_size/1e6:.1f} MB)")
+    else:
+        print(f"  MISSING {DDOT_MANUAL} — download manually in a browser:")
+        print(f"    https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip")
+        print(f"    Save to: {ddot_path}")
     for name, url in DOWNLOADS.items():
         try:
             download(name, url)

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Last Bus Out</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=0.1.2" />
 </head>
 <body>
   <aside id="panel">
@@ -33,6 +33,8 @@
     </section>
 
     <section id="controls" hidden>
+      <div id="shiftBtns" class="shifts" hidden></div>
+      <p id="shiftCompare" class="compare" hidden></p>
       <div class="row between">
         <label>Shift</label>
         <select id="dayType">
@@ -53,6 +55,7 @@
 
     <section id="result" hidden>
       <div class="big"><span id="pct">–</span><small>of car-free households in the region can make the round trip</small></div>
+      <p id="lastBus" class="lastbus"></p>
       <ul class="legend">
         <li><i class="g"></i><span id="nGreen">0</span> households: bus there <b>and</b> home</li>
         <li><i class="a"></i><span id="nAmber">0</span> households: bus there, <b>no bus home</b></li>
@@ -74,6 +77,6 @@
   <main id="map"></main>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=0.1.2"></script>
 </body>
 </html>

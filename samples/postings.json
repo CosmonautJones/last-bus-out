@@ -14,7 +14,7 @@
   {
     "id": "supplier",
     "title": "Assembly operator · Sterling Heights",
-    "text": "Assembly Operator - Tier 2 auto supplier (fictional), Sterling Heights.\nAddress: Mound Rd & 17 Mile Rd, Sterling Heights, MI\nFirst shift 6:00am-2:30pm or second shift 2:30pm-11:00pm, Mon-Fri. Mandatory overtime as needed. No experience required.",
-    "fallback_site": {"lat": 42.5605, "lon": -83.0376, "label": "Mound Rd & 17 Mile Rd, Sterling Heights (approx.)"}
+    "text": "Assembly Operator - Tier 2 auto supplier (fictional), Sterling Heights.\nAddress: Van Dyke Ave & 17 Mile Rd, Sterling Heights, MI\nFirst shift 6:00am-2:30pm or second shift 2:30pm-11:00pm, Mon-Fri. Mandatory overtime as needed. No experience required.",
+    "fallback_site": {"lat": 42.5803, "lon": -83.0301, "label": "Van Dyke Ave & 17 Mile Rd, Sterling Heights (approx.)"}
   }
 ]

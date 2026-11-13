@@ -4,7 +4,7 @@ const COLORS = { both: "#1a9850", toOnly: "#f39c12", none: "#cfd5da" };
 
 let map, tractLayer, siteMarker, siteStopsLayer;
 let samples = [];
-let current = { lat: null, lon: null, label: null, employer: null, reach: null, fallbackSite: null };
+let current = { lat: null, lon: null, label: null, employer: null, reach: null, fallbackSite: null, shifts: [], shiftIdx: 0 };
 
 const fmt = (m) => {
   m = ((Math.round(m) % 1440) + 1440) % 1440;
@@ -36,7 +36,7 @@ async function init() {
     if (!h.data_loaded) { $("dataInfo").textContent = "data not built yet"; setStatus("Run scripts/fetch_data.py and scripts/build_index.py first."); }
     else {
       const f = h.meta.feeds || {};
-      $("dataInfo").textContent = Object.entries(f).map(([a, v]) => `${a} schedule for ${v.weekday?.date ?? "?"}`).join(" · ") + ` · ACS ${h.meta.acs_year}`;
+      $("dataInfo").textContent = Object.entries(f).map(([a, v]) => feedLabel(a, v.weekday?.date)).join(" · ") + ` · ACS ${h.meta.acs_year}`;
     }
   } catch (e) { $("version").textContent = "v?"; }
 
@@ -60,6 +60,14 @@ async function init() {
   $("dayType").onchange = async () => { if (current.lat != null) await loadReach(); };
 }
 
+// Footer label: say plainly when a feed's newest published weekday is not current.
+function feedLabel(agency, date) {
+  if (!date) return `${agency} schedule for ?`;
+  const d = new Date(`${date}T12:00:00`);
+  if (Date.now() - d.getTime() > 30 * 864e5) return `${agency} weekday schedule, ${d.toLocaleString("en-US", { month: "long", year: "numeric" })}`;
+  return `${agency} schedule for ${date}`;
+}
+
 function styleFor(status, zc = 0) {
   const fill = COLORS[status];
   return { color: "#ffffff", weight: 0.5, fillColor: fill, fillOpacity: status === "none" ? 0.35 : 0.55 + Math.min(zc / 800, 0.35) };
@@ -74,6 +82,79 @@ function tractStatus(opts, start, end) {
   const there = (opts.in || []).find((o) => o[0] >= lo && o[0] <= hi);
   const home = (opts.out || []).find((o) => o[0] >= end && o[0] <= end + r.max_wait_home_min);
   return { status: there && home ? "both" : there ? "toOnly" : "none", there, home };
+}
+
+// Car-free households by status for any start/end, reusing tractStatus (no new math).
+function coverage(start, end) {
+  let hhBoth = 0, hhTo = 0;
+  tractLayer.eachLayer((l) => {
+    const p = l.feature.properties;
+    const t = tractStatus(current.reach.tracts[p.i], start, end);
+    if (t.status === "both") hhBoth += p.zc; else if (t.status === "toOnly") hhTo += p.zc;
+  });
+  return { hhBoth, hhTo, pct: 100 * hhBoth / (current.reach.zero_car_hh_total || 1) };
+}
+
+const ORD = ["1st", "2nd", "3rd", "4th"];
+function shiftMins(s) {
+  const start = hhmmToMin(s.start); let end = hhmmToMin(s.end);
+  if (end <= start) end += 1440;
+  return { start, end };
+}
+
+function renderShiftButtons() {
+  const box = $("shiftBtns");
+  box.innerHTML = "";
+  const many = current.shifts.length >= 2;
+  box.hidden = !many;
+  $("shiftCompare").hidden = !many;
+  if (!many) return;
+  current.shifts.slice(0, 4).forEach((s, i) => {
+    const b = document.createElement("button");
+    const { start, end } = shiftMins(s);
+    b.textContent = `${ORD[i]} shift ${fmt(start)} – ${fmt(end)}`;
+    b.className = i === current.shiftIdx ? "active" : "";
+    b.onclick = () => selectShift(i);
+    box.appendChild(b);
+  });
+}
+
+function selectShift(i) {
+  const s = current.shifts[i];
+  if (!s) return;
+  current.shiftIdx = i;
+  const { start, end } = shiftMins(s);
+  $("start").value = start;
+  $("end").value = end;
+  renderShiftButtons();
+  updateLabels();
+  render();
+  debounceMemo();
+}
+
+function updateShiftCompare() {
+  if (current.shifts.length < 2) return;
+  $("shiftCompare").textContent = current.shifts.slice(0, 4).map((s, i) => {
+    const { start, end } = shiftMins(s);
+    return `${ORD[i]} shift: ${coverage(start, end).pct.toFixed(1)}%${i === 0 ? " round trip" : ""}`;
+  }).join(" · ");
+}
+
+// "Last bus home" line: latest scheduled departure from the site inside the wait window,
+// or, if there is none, the last one that left before the shift ended.
+function updateLastBus(end) {
+  const r = rules();
+  let inWin = null, before = null;
+  for (const t of Object.values(current.reach.tracts)) for (const o of (t.out || [])) {
+    if (o[0] >= end && o[0] <= end + r.max_wait_home_min) { if (!inWin || o[0] > inWin[0]) inWin = o; }
+    else if (o[0] < end) { if (!before || o[0] > before[0]) before = o; }
+  }
+  const route = (o) => current.reach.routes?.[o[1]] ?? "bus";
+  const dur = (d) => d >= 60 ? `${Math.floor(d / 60)} h ${d % 60} min` : `${d} min`;
+  const el = $("lastBus");
+  if (inWin) { el.textContent = `Last bus home: ${route(inWin)} leaves ${fmt(inWin[0])} (${dur(inWin[0] - end)} after shift ends)`; el.className = "lastbus"; }
+  else if (before) { el.textContent = `Last bus home: ${route(before)} leaves ${fmt(before[0])}, ${dur(end - before[0])} before this shift ends`; el.className = "lastbus warn"; }
+  else { el.textContent = "Last bus home: no bus leaves this site"; el.className = "lastbus warn"; }
 }
 
 function shiftTimes() {
@@ -111,6 +192,8 @@ function render() {
   $("pct").textContent = `${(100 * hhBoth / total).toFixed(1)}%`;
   $("nGreen").textContent = num(hhBoth);
   $("nAmber").textContent = num(hhTo);
+  updateLastBus(end);
+  updateShiftCompare();
   $("result").hidden = false;
 }
 
@@ -140,6 +223,9 @@ async function run() {
     updateLabels();
     $("controls").hidden = false;
     current.employer = post.employer;
+    current.shifts = (post.shifts || []).filter((x) => x && x.start && x.end);
+    current.shiftIdx = 0;
+    renderShiftButtons();
 
     let site = null;
     if (post.address) {
