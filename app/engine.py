@@ -37,7 +37,7 @@ class Rules:
 class Network:
     def __init__(self, build_dir: Path = BUILD_DIR):
         self.build_dir = Path(build_dir)
-        self.meta = json.loads((self.build_dir / "meta.json").read_text())
+        self.meta = json.loads((self.build_dir / "meta.json").read_text(encoding="utf-8"))
         self.stops = pd.read_pickle(self.build_dir / "stops.pkl")
         self.routes = pd.read_pickle(self.build_dir / "routes.pkl")
         self.tracts = pd.read_pickle(self.build_dir / "tracts.pkl")

@@ -84,7 +84,7 @@ def fetch_acs() -> None:
         data = r.json()
         header, body = data[0], data[1:]
         rows.extend(dict(zip(header, row)) for row in body)
-    out.write_text(json.dumps({"year": ACS_YEAR, "table": "B25044", "rows": rows}))
+    out.write_text(json.dumps({"year": ACS_YEAR, "table": "B25044", "rows": rows}), encoding="utf-8")
     print(f"       {len(rows)} tracts")
 
 

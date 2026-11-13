@@ -25,8 +25,8 @@ function setStatus(msg) { $("status").textContent = msg || ""; }
 
 async function init() {
   map = L.map("map", { zoomControl: true }).setView([42.39, -83.1], 10);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 18,
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    attribution: "Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors", maxZoom: 16,
   }).addTo(map);
   map.on("click", (e) => { if (current.reach !== undefined) placeSite(e.latlng.lat, e.latlng.lng, "Map pin"); });
 

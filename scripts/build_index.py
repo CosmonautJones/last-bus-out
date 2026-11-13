@@ -118,7 +118,7 @@ def read_tracts(raw_dir: Path) -> pd.DataFrame:
     gj = raw_dir / "tracts.geojson"  # optional pre-converted file (used by tests)
     feats = []
     if gj.exists():
-        for f in json.loads(gj.read_text())["features"]:
+        for f in json.loads(gj.read_text(encoding="utf-8"))["features"]:
             feats.append((f["properties"], shape(f["geometry"])))
     else:
         import shapefile  # pyshp
@@ -151,7 +151,7 @@ def read_tracts(raw_dir: Path) -> pd.DataFrame:
 
 
 def read_acs(raw_dir: Path) -> pd.DataFrame:
-    data = json.loads((raw_dir / "acs_b25044.json").read_text())
+    data = json.loads((raw_dir / "acs_b25044.json").read_text(encoding="utf-8"))
     df = pd.DataFrame(data["rows"])
     df["geoid"] = df["state"] + df["county"] + df["tract"]
     for c in ["B25044_001E", "B25044_003E", "B25044_010E"]:
@@ -284,8 +284,8 @@ def build(raw_dir: Path = RAW_DIR, build_dir: Path = BUILD_DIR, feeds=FEEDS) -> 
          "properties": {"i": int(row.tract_idx), "geoid": row.geoid, "name": row.name,
                         "zc": int(row.zero_car_hh), "hh": int(row.total_hh)}}
         for row in tracts.itertuples()]}
-    (build_dir / "tracts.geojson").write_text(json.dumps(fc, separators=(",", ":")))
-    (build_dir / "meta.json").write_text(json.dumps(meta, indent=2))
+    (build_dir / "tracts.geojson").write_text(json.dumps(fc, separators=(",", ":")), encoding="utf-8")
+    (build_dir / "meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
     print(f"  stops={len(stops)} routes={len(routes)} tracts={len(tracts)} "
           f"tracts_with_stop={meta['tracts_with_stop']} zero_car_hh={meta['zero_car_hh_total']}")
     return meta

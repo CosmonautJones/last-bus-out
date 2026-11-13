@@ -7,7 +7,7 @@ from pathlib import Path
 import httpx
 
 ROOT = Path(__file__).resolve().parent.parent
-samples = json.loads((ROOT / "samples" / "postings.json").read_text())
+samples = json.loads((ROOT / "samples" / "postings.json").read_text(encoding="utf-8"))
 
 for s in samples:
     print(f"\n--- {s['id']}: {s['title']} ---")

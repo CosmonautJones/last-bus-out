@@ -10,7 +10,7 @@ The hackathon requires a list of every public source. Raw files are downloaded b
 | ACS 5-year, table B25044 (tenure by vehicles available) | U.S. Census Bureau | https://api.census.gov/data/2023/acs/acs5 | U.S. government work, public domain |
 | Cartographic boundary file, census tracts (MI) | U.S. Census Bureau | https://www2.census.gov/geo/tiger/GENZ2023/shp/cb_2023_26_tract_500k.zip | Public domain |
 | Geocoder | U.S. Census Bureau | https://geocoding.geo.census.gov/geocoder/ | Public service |
-| Basemap tiles | CARTO, OpenStreetMap contributors | https://carto.com/basemaps | Attribution shown on map |
+| Basemap tiles | Esri, HERE, Garmin, OpenStreetMap contributors | https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer | Esri Master License Agreement; free for non-commercial use with attribution |
 
 Context figures cited in the pitch:
 - DDOT performance dashboard (on-time %): https://detroitmi.gov/taxonomy/term/5641

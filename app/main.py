@@ -79,7 +79,7 @@ def tracts():
 @app.get("/api/samples")
 def samples():
     p = config.SAMPLES_DIR / "postings.json"
-    return json.loads(p.read_text()) if p.exists() else []
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
 
 
 @app.post("/api/parse")

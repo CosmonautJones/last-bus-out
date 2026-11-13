@@ -9,7 +9,7 @@ except ImportError:
     pass
 
 ROOT = Path(__file__).resolve().parent.parent
-VERSION = (ROOT / "VERSION").read_text().strip()
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 
 RAW_DIR = Path(os.getenv("LBO_RAW_DIR", ROOT / "data" / "raw"))
 BUILD_DIR = Path(os.getenv("LBO_BUILD_DIR", ROOT / "data" / "build"))
