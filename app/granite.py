@@ -51,7 +51,11 @@ MEMO_SYSTEM = (
     "You write a short, plain-language memo to an employer about whether workers without a car can "
     "get to and from a shift by bus. Write at most 3 sentences. Use ONLY the numbers that appear in the "
     "FACTS JSON, copied exactly as written there. Do not compute new numbers, percentages or times. "
-    "Do not promise anything about bus reliability. End with one concrete suggestion if FACTS has one."
+    "Do not promise anything about bus reliability. End with one concrete suggestion if FACTS has one. "
+    "zero_car_hh_round_trip and pct_round_trip count households that CAN make the round trip; stranded_hh "
+    "counts households that can get there but have no bus home. The household count in the suggestion is "
+    "the TOTAL that could make the round trip with the new end time, not an increase: never write "
+    "'additional', 'more' or 'extra' households."
 )
 
 
@@ -192,6 +196,23 @@ def verify_numbers(memo: str, facts: dict) -> tuple[bool, list[str]]:
     return (not bad), bad
 
 
+# Wording that turns a correct number into a wrong claim: a total described as an increase,
+# or the round-trip share described as households that cannot make the trip.
+_INCREASE = re.compile(r"\b(additional|extra|more)\b[^.]*\bhouseholds\b|\bhouseholds\b[^.]*\b(additional|extra)\b", re.I)
+_CANNOT = re.compile(r"\b(cannot|can't|can not|unable to)\b", re.I)
+
+
+def misleading_wording(memo: str, facts: dict) -> str | None:
+    if _INCREASE.search(memo):
+        return "describes a total as an increase"
+    pct = str(facts.get("pct_round_trip", ""))
+    if pct and pct != "0.0%":
+        for sentence in re.split(r"(?<=[.!?])\s+", memo):
+            if pct in sentence and _CANNOT.search(sentence):
+                return "describes the round-trip share as households that cannot make the trip"
+    return None
+
+
 def template_memo(f: dict) -> str:
     s = (f"For the {f['shift']} shift at {f['site']}, {f['zero_car_hh_round_trip']} car-free households "
          f"({f['pct_round_trip']}) can make the full round trip by bus with no transfers.")
@@ -210,6 +231,11 @@ def write_memo(facts: dict) -> dict:
             memo = memo.strip()
             ok, bad = verify_numbers(memo, facts)
             if ok:
+                why = misleading_wording(memo, facts)
+                if why:
+                    return {"memo": template_memo(facts), "provider": provider + " (wording rejected → template)",
+                            "verified": True, "rejected_numbers": [], "fallback": True,
+                            "error": f"Granite's memo {why}"}
                 return {"memo": memo, "provider": provider, "verified": True, "rejected_numbers": [], "fallback": False}
             error = f"Granite used numbers not in the facts: {bad}"
             return {"memo": template_memo(facts), "provider": provider + " (rejected → template)",

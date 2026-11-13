@@ -11,3 +11,5 @@ __pycache__/
 .venv/
 .pytest_cache/
 .DS_Store
+# recorded demo video (upload it, do not commit)
+demo/

@@ -1,85 +1,155 @@
-# Last Bus Out · v0.1.3
+# Last Bus Out · v0.1.4
 
 **Can workers without a car get to this shift, and home again?**
 
-Paste a job posting. IBM Granite reads the address and shift times out of the messy text. Then a
-deterministic engine checks every scheduled DDOT and SMART bus and colors the Detroit-area map:
+Last Bus Out is a small web app for the person who sets shift times at a Southeast Michigan
+warehouse, hospital or auto supplier. Paste a job posting and it shows, on a map, which
+neighborhoods can reach that shift by bus and still catch a bus home afterwards.
 
-- 🟢 **green**: a bus gets you there before the shift **and** a bus gets you home after it
-- 🟠 **amber**: you can get there, but **no bus home** within 45 minutes of the shift ending
-- ⚪ **grey**: no one-seat bus ride
+Built for the Michigan DevFest + AI Hackathon (Detroit, November 13, 2026). Team: **Trav**.
+Focus area: Next-Gen Mobility.
 
-Drag the shift-end slider and watch the map change. A "Last bus home" line shows the last scheduled
-bus and how many minutes before or after the shift it leaves. Postings with two shifts get a
-1st/2nd shift switch and a side-by-side coverage line. Granite then writes a three-sentence memo
-for the employer. Every number in that memo is checked against the schedule data, and if Granite
-invents one, the memo is rejected and replaced with a template.
+## Why it exists
 
-Michigan DevFest + AI Hackathon, Nov 13 2026 · Focus area: **Next-Gen Mobility**
-(transportation and logistics for Michigan) · overlaps Modernizing Michigan Manufacturing (shift work).
+About one in three Detroit residents don't own a car. Transit apps (Google Maps, Transit,
+DDOT Bus Tracker) answer a rider's question about one trip. None of them answer the
+employer's question: **if my shift ends at 11:30 PM, who can still get home?**
 
-## The user and the problem
+Employers who don't know the answer shrink their own hiring pool and strand late-shift workers.
 
-**User:** the HR or operations lead at a Southeast Michigan warehouse, hospital or auto supplier
-who sets shift times. Second user: workforce boards that place job seekers.
+## What you see in the demo
 
-**Problem:** employers set shift times without knowing whether car-free workers can get home.
-About a third of Detroit residents don't own a car, DDOT's weekday afternoon on-time rate was
-about two-thirds in 2025, and riders report evening service gaps. Existing tools (Transit app,
-Google Maps, DDOT Bus Tracker) answer a rider's question about one trip. None answer the
-employer's question: *if my shift ends at 11:30 PM, who can still get home?*
+One of the sample postings is a fictional warehouse in Romulus with a 3:00 PM to 11:30 PM shift
+and the line "Reliable transportation required." For that shift the app shows:
+
+- **1,867 car-free households** live where a bus gets them to the shift on time.
+- **None of them** have a bus home: the last SMART 280 leaves at 11:23 PM, seven minutes
+  before the shift ends.
+- Move the shift end to 11:00 PM and **1,699 of those households** can make the round trip.
+
+## How to use it
+
+1. **Paste a job posting** (or click one of the three samples) and press **Check this shift**.
+2. **IBM Granite reads the posting** and pulls out the employer, address, shift times and days.
+   You can see exactly what it read, and the raw JSON.
+3. **The map colors every census tract** in Wayne, Oakland and Macomb counties:
+
+   | Color | Meaning |
+   |---|---|
+   | Green | A bus gets you there before the shift **and** a bus gets you home after it |
+   | Amber | You can get there, but there is **no bus home** within 45 minutes of the shift ending |
+   | Grey | No one-seat bus ride to this site |
+
+4. **Read the result**: the share and number of car-free households that can make the round
+   trip, and a **"Last bus home"** line showing the last scheduled bus and how many minutes
+   before or after the shift it leaves.
+5. **Drag the shift sliders** and the map recolors instantly. If the posting lists two shifts,
+   buttons let you switch between them and a line compares their coverage.
+6. **Granite writes a short memo for the employer.** Every number in the memo is checked against
+   the computed facts. If Granite invents a number, the memo is thrown away and replaced with a
+   plain template.
 
 ## How it works
 
+The AI reads and writes text. It never decides who can get to work; the bus schedules do.
+
 | Step | What does it | AI? |
 |---|---|---|
-| Read the posting (address, shift start/end, days, notes like "rotating Saturdays") | **IBM Granite** on **watsonx.ai** | ✅ |
-| Address → coordinates | U.S. Census Geocoder | no |
-| Find bus stops ≤ 0.5 mi of the site; every scheduled trip through them | Python (pandas) over DDOT + SMART GTFS | no |
-| For each census tract: a bus there before the shift? a bus home after? | Deterministic rules (shown in UI) | no |
-| Weight by car-free households (ACS table B25044) | Python | no |
-| Write the employer memo from computed facts; reject invented numbers | **IBM Granite** + number verifier | ✅ (checked) |
+| Read the posting (address, shift start and end, days, notes) | **IBM Granite** on **watsonx.ai** | Yes |
+| Turn the address into coordinates | U.S. Census Geocoder | No |
+| Find bus stops within a half-mile walk of the site and every scheduled trip through them | Python (pandas) over the DDOT and SMART schedules | No |
+| For each census tract: is there a bus before the shift, and a bus home after? | Fixed rules, listed below | No |
+| Weight each tract by its car-free households | Census ACS table B25044 | No |
+| Write the employer memo from the computed facts | **IBM Granite**, then a number checker | Yes, checked |
 
-Rules (in `app/config.py`): walk ≤ 800 m each end at ~3 mph with a 1.3 street-detour factor;
-arrive 5–60 min before shift start; a bus home must leave within 45 min of shift end; one-seat
-rides ≤ 90 min. **Transfers are not modeled in v0.1**, so results are conservative.
+**The rules** (set in `app/config.py`):
 
-## Run it
+- Walk at most 800 m (about half a mile) at each end, at roughly 3 mph with a 1.3 street-detour factor.
+- Arrive between 5 and 60 minutes before the shift starts.
+- A bus home must leave within 45 minutes of the shift ending.
+- One-seat rides only, 90 minutes at most. **Transfers are not modeled yet**, so results are conservative.
 
-```bash
-make setup                 # or: python -m venv .venv && pip install -r requirements.txt
-cp .env.example .env       # add watsonx.ai API key + project ID (never commit .env)
-make data                  # downloads public data, builds data/build/ (~1-3 min)
-make run                   # http://localhost:8000
-make test                  # synthetic-network tests, no internet needed
+**Size of the real data build:** 10,541 bus stops, 82 routes, 1,218 census tracts (739 with a stop
+in walking distance) and about 130,800 car-free households.
+
+## Run it yourself
+
+Requires Python 3.10 or newer, an IBM watsonx.ai API key and project ID, and a free Census API key.
+
+Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+copy .env.example .env          # then add your watsonx.ai key, project ID and Census key
+.venv\Scripts\python scripts\fetch_data.py
+.venv\Scripts\python scripts\build_index.py
+.venv\Scripts\uvicorn app.main:app --port 8000      # open http://localhost:8000
+.venv\Scripts\python -m pytest -q tests
 ```
 
-No watsonx access yet? Set `LBO_LLM_PROVIDER=ollama` (Granite open weights via `ollama pull granite3.3:8b`)
-or `mock` (regex fallback, clearly labeled "not Granite" in the UI).
+macOS / Linux:
 
-## Data sources (all public; details in `data/SOURCES.md`)
+```bash
+make setup && cp .env.example .env    # add your keys to .env (never commit it)
+make data                             # downloads the public data and builds data/build/
+make run                              # http://localhost:8000
+make test
+```
 
-- DDOT GTFS schedule, City of Detroit
-- SMART GTFS schedule, Suburban Mobility Authority for Regional Transportation
-- U.S. Census Bureau ACS 5-year, table B25044 (tenure by vehicles available), tracts in Wayne, Oakland, Macomb
-- U.S. Census Bureau cartographic boundary file, Michigan census tracts
-- U.S. Census Geocoder
+The city's DDOT download blocks scripts. To use the newest DDOT schedule, download
+`ddot_gtfs.zip` from the City of Detroit in a browser, save it as `data/raw/ddot_gtfs.zip`,
+and run `build_index.py` again. `fetch_data.py` never overwrites a file that is already there.
 
-Sample job postings in `samples/` are **fictional**. No personal information is collected or stored.
+No watsonx.ai access? Set `LBO_LLM_PROVIDER=ollama` to run Granite's open weights locally, or
+`mock` for a regex fallback that the UI clearly labels as "not Granite".
+
+## Project layout
+
+| Path | What it is |
+|---|---|
+| `app/main.py` | FastAPI server and JSON API |
+| `app/engine.py` | The deterministic reachability engine |
+| `app/granite.py` | Granite calls: posting extraction, memo, number checker |
+| `app/geocode.py` | U.S. Census Geocoder client |
+| `scripts/fetch_data.py`, `scripts/build_index.py` | Download the public data and build the index |
+| `scripts/record_demo.py` | Optional: records the captioned demo video with Playwright |
+| `web/` | The one-page interface (Leaflet map) |
+| `samples/postings.json` | Three fictional job postings |
+| `tests/` | Tests on a small synthetic bus network (no internet needed) |
+| `data/SOURCES.md` | Every data source and its terms |
+| `HACKATHON.md`, `BOB_PLAYBOOK.md`, `bob_usage/` | Submission kit and IBM Bob usage evidence |
+
+## Data sources
+
+All public; details and links are in `data/SOURCES.md`.
+
+- DDOT bus schedule (GTFS), City of Detroit
+- SMART bus schedule (GTFS), Suburban Mobility Authority for Regional Transportation
+- U.S. Census Bureau ACS 5-year table B25044 (vehicles available by household), tracts in Wayne, Oakland and Macomb
+- U.S. Census Bureau tract boundaries and Geocoder
+
+The sample job postings are **fictional**. No personal information is collected or stored.
 
 ## Tools used (required disclosure)
 
-- **IBM Bob IDE**: core build tool (see `BOB_PLAYBOOK.md` and `bob_usage/`)
-- **IBM watsonx.ai + IBM Granite**: posting extraction and employer memo
-- **IBM Code Engine**: optional deployment target (`Dockerfile`); not deployed for the demo
-- Claude (Anthropic) was used for research, the initial scaffold, and the v0.1.2 front-end polish
-  (shift switch, last-bus line, styling), reviewed and tested before commit
-- Leaflet + Esri World Light Gray basemap
+- **IBM Bob IDE**: core build tool. Bob ran and fixed the real-data pipeline, wired and verified
+  Granite on watsonx.ai, and made the Windows and basemap fixes (see `BOB_PLAYBOOK.md` and `bob_usage/`).
+- **IBM watsonx.ai + IBM Granite** (`ibm/granite-4-h-small`): posting extraction and the employer memo.
+- **Claude (Anthropic)**: research, the initial scaffold, the front-end polish in v0.1.2 and later
+  (shift switch, last-bus line, styling), this README and the demo recording script.
+- **IBM Code Engine**: optional deployment target (`Dockerfile`); not deployed for the demo.
+- Leaflet with the Esri World Light Gray basemap.
+- No Google tools were used.
 
-## Limitations (we say these out loud)
+## Limitations
 
-- The DDOT feed used is the weekday schedule from July 2026 (the newest copy we could download
-  automatically); the SMART feed is current (November 2026). The footer shows both dates.
-- Scheduled times, not live arrivals. DDOT reliability means tight margins are risky.
-- One-seat rides only; tract centroids approximate where people live; ACS estimates have margins of error.
-- Weekend modeling uses one representative Saturday and Sunday from each feed.
+- **Scheduled times, not live arrivals.** DDOT's weekday afternoon on-time rate was about two-thirds
+  in 2025, so treat tight margins as risky.
+- **The DDOT schedule in the demo is from July 2026**, the newest copy that could be downloaded
+  automatically. The SMART schedule is current (November 2026). The page footer shows both dates.
+- **One-seat rides only.** A tract shown as grey may still be reachable with a transfer.
+- **The memo's numbers are checked exactly; its wording only partly.** Two known misleading phrasings
+  are caught and replaced with the template, but the map and the counts beside it are the source of truth.
+- Tract centers approximate where people live, and Census estimates have margins of error.
+- Weekend results use one representative Saturday and Sunday from each feed.
