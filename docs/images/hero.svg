@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="460" viewBox="0 0 1280 460" role="img" aria-labelledby="title desc">
+  <title id="title">Last Bus Out</title>
+  <desc id="desc">A job is only reachable if you can get home. A conceptual transit route connects home, a work shift, and home again. Built for the Michigan DevFest and AI Hackathon 2026, Next-Gen Mobility.</desc>
+  <rect width="1280" height="460" rx="18" fill="#0f1b2a"/>
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <circle cx="63" cy="47" r="7" fill="#58d68d"/>
+    <text x="84" y="53" fill="#bccbdd" font-size="17" font-weight="600" letter-spacing="1.7">MICHIGAN DEVFEST + AI HACKATHON / 2026</text>
+    <text x="56" y="149" fill="#ffffff" font-size="83" font-weight="800" letter-spacing="-3">LAST BUS OUT</text>
+    <text x="60" y="205" fill="#e0e8f2" font-size="30" font-weight="400">A job is only reachable if you can get home.</text>
+
+    <g transform="translate(1080 80)" fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round">
+      <rect x="-26" y="-8" width="170" height="134" rx="8" fill="#0f62fe" stroke="none"/>
+      <rect x="18" y="10" width="84" height="88" rx="13"/>
+      <path d="M26 36H94V66H26Z" fill="#ffffff" stroke="none"/>
+      <path d="M44 23H76M12 42V61M108 42V61" stroke-linecap="round"/>
+      <circle cx="34" cy="81" r="5" fill="#ffffff" stroke="none"/>
+      <circle cx="86" cy="81" r="5" fill="#ffffff" stroke="none"/>
+      <path d="M31 98V106M89 98V106" stroke-width="8" stroke-linecap="round"/>
+    </g>
+
+    <path d="M56 246H1224" stroke="#304255" stroke-width="1"/>
+    <path d="M100 312H640" stroke="#5e9aff" stroke-width="8"/>
+    <path d="M640 312H1180" stroke="#58d68d" stroke-width="8"/>
+    <path d="M360 300L379 312L360 324Z" fill="#5e9aff"/>
+    <path d="M900 300L919 312L900 324Z" fill="#58d68d"/>
+    <g stroke-width="5" fill="#0f1b2a">
+      <circle cx="100" cy="312" r="14" stroke="#5e9aff"/>
+      <circle cx="640" cy="312" r="20" stroke="#ffffff"/>
+      <circle cx="1180" cy="312" r="14" stroke="#58d68d"/>
+    </g>
+    <circle cx="640" cy="312" r="6" fill="#ffffff"/>
+    <g font-size="20" font-weight="700" letter-spacing="2">
+      <text x="100" y="360" text-anchor="middle" fill="#ffffff">HOME</text>
+      <text x="640" y="360" text-anchor="middle" fill="#ffffff">SHIFT</text>
+      <text x="1180" y="360" text-anchor="middle" fill="#ffffff">HOME</text>
+    </g>
+    <g font-size="17" fill="#bccbdd">
+      <text x="100" y="387" text-anchor="middle">Get there.</text>
+      <text x="640" y="387" text-anchor="middle">See what a different end time changes.</text>
+      <text x="1180" y="387" text-anchor="middle">Get back.</text>
+    </g>
+    <path d="M56 413H1224" stroke="#304255" stroke-width="1"/>
+    <text x="56" y="442" fill="#bccbdd" font-size="15" font-weight="600" letter-spacing="1.5">SOUTHEAST MICHIGAN · NEXT-GEN MOBILITY</text>
+    <text x="1224" y="442" text-anchor="end" fill="#bccbdd" font-size="15">Granite reads. The schedules decide.</text>
+  </g>
+</svg>

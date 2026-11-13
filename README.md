@@ -1,157 +1,223 @@
-# Last Bus Out · v0.1.5
+<p align="center">
+  <img src="docs/images/hero.svg" alt="Last Bus Out. A job is only reachable if you can get home. A conceptual bus route connects home, shift, and home again." width="100%">
+</p>
 
-**Can workers without a car get to this shift, and home again?**
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%2B-0f1b2a?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.10 or newer">
+  <img src="https://img.shields.io/badge/AI-IBM_Granite-0f62fe?style=flat-square" alt="AI: IBM Granite">
+  <img src="https://img.shields.io/badge/Focus-Next--Gen_Mobility-1a9850?style=flat-square" alt="Focus: Next-Gen Mobility">
+</p>
 
-**[▶ Demo video (1 min)](https://youtu.be/d1puFY888es)**
+<p align="center">
+  <a href="https://youtu.be/d1puFY888es"><strong>Watch the demo ↗</strong></a> ·
+  <a href="#the-30-minute-difference">The 30-minute difference</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#run-locally">Run locally</a>
+</p>
 
-Last Bus Out is a small web app for the person who sets shift times at a Southeast Michigan
-warehouse, hospital or auto supplier. Paste a job posting and it shows, on a map, which
-neighborhoods can reach that shift by bus and still catch a bus home afterwards.
+# Can workers get to this shift, and home again?
 
-Built for the Michigan DevFest + AI Hackathon (Detroit, November 13, 2026). Team: **Trav**.
-Focus area: Next-Gen Mobility.
+**Last Bus Out turns a job posting into a map of who can make the round trip by bus.** Built for the HR or operations lead setting shift times at a Southeast Michigan warehouse, hospital, or auto supplier, it makes the last bus home part of the scheduling decision.
 
-## Why it exists
+Paste a posting. See the transit gap. Move the shift time and watch the map change.
 
-About one in three Detroit residents don't own a car. Transit apps (Google Maps, Transit,
-DDOT Bus Tracker) answer a rider's question about one trip. None of them answer the
-employer's question: **if my shift ends at 11:30 PM, who can still get home?**
+**Michigan DevFest + AI Hackathon** · Detroit · November 13, 2026<br>
+**Team Trav** · Next-Gen Mobility · v0.1.5
 
-Employers who don't know the answer shrink their own hiring pool and strand late-shift workers.
+## Watch the one-minute demo
 
-## What you see in the demo
+<a href="https://youtu.be/d1puFY888es">
+  <img src="https://i.ytimg.com/vi/d1puFY888es/maxresdefault.jpg" alt="Watch the Last Bus Out demo: a Romulus warehouse posting, Granite's extracted shift details, and the Southeast Michigan map." width="100%">
+</a>
 
-One of the sample postings is a fictional warehouse in Romulus with a 3:00 PM to 11:30 PM shift
-and the line "Reliable transportation required." For that shift the app shows:
+**[▶ Play the demo on YouTube](https://youtu.be/d1puFY888es)** · Actual application footage · [Submission overview](SUBMISSION.md)
 
-- **1,867 car-free households** live where a bus gets them to the shift on time.
-- **None of them** have a bus home: the last SMART 280 leaves at 11:23 PM, seven minutes
-  before the shift ends.
-- Move the shift end to 11:00 PM and **1,699 of those households** can make the round trip.
+## The 30-minute difference
 
-## How to use it
+The demo starts with a **fictional Romulus warehouse posting**: 3:00 PM to 11:30 PM, with the familiar line *“Reliable transportation required.”*
 
-1. **Paste a job posting** (or click one of the three samples) and press **Check this shift**.
-2. **IBM Granite reads the posting** and pulls out the employer, address, shift times and days.
-   You can see exactly what it read, and the raw JSON.
-3. **The map colors every census tract** in Wayne, Oakland and Macomb counties:
+The app's **“Last bus home” cutoff is 11:23 PM**. The shift ends seven minutes too late.
 
-   | Color | Meaning |
-   |---|---|
-   | Green | A bus gets you there before the shift **and** a bus gets you home after it |
-   | Amber | You can get there, but there is **no bus home** within 45 minutes of the shift ending |
-   | Grey | No one-seat bus ride to this site |
+![Recorded demo comparison: the posted 11:30 PM end allows 1,867 car-free households to get there but zero to make the round trip. An 11:00 PM end allows 1,699 households to make the round trip.](docs/images/shift-impact.svg)
 
-4. **Read the result**: the share and number of car-free households that can make the round
-   trip, and a **"Last bus home"** line showing the last scheduled bus and how many minutes
-   before or after the shift it leaves.
-5. **Drag the shift sliders** and the map recolors instantly. If the posting lists two shifts,
-   buttons let you switch between them and a line compares their coverage.
-6. **Granite writes a short memo for the employer.** Every number in the memo is checked against
-   the computed facts. If Granite invents a number, the memo is thrown away and replaced with a
-   plain template.
+| Same workplace, different end time | Posted shift | Try an earlier end |
+|---|---:|---:|
+| Shift starts | 3:00 PM | 3:00 PM |
+| Shift ends | 11:30 PM | **11:00 PM** |
+| Car-free households with a round trip | **0** | **1,699** |
+
+*These are recorded-demo results from the schedule and Census data used for the hackathon, not live counts or a forecast of hires. Moving only the end time shortens the shift. The “Last bus home” cutoff includes the estimated walk from the workplace to the stop.*
+
+**The employer's question:** “If this is when work ends, who can still get home?” A route to work only answers half of it.
+
+## From job posting to scheduling decision
+
+1. **Paste the job.** Start with your own posting or one of three fictional samples: a Romulus warehouse, Midtown Detroit food service, or Sterling Heights assembly work.
+2. **Check what Granite read.** IBM Granite extracts the employer, address, shift times, days, and notes. Inspect the fields or open the raw JSON.
+3. **See the round trip.** The map colors census tracts across Wayne, Oakland, and Macomb counties and weights the results by car-free households.
+4. **Try a better fit.** Drag the shift sliders to update the map immediately, or switch between extracted shifts to compare coverage. No new AI call is needed to recolor the map.
+5. **Read the employer memo.** Granite summarizes the computed facts. A number checker rejects unsupported numbers and substitutes a plain template when validation fails.
+
+| Map color | What it tells the employer |
+|---|---|
+| 🟢 **There and home** | A qualifying bus journey reaches the shift and returns after it. |
+| 🟠 **There, but no bus home** | Workers can arrive, but there is no qualifying return within the allowed window. |
+| ⚪ **No qualifying outbound journey** | The model cannot find a qualifying bus journey to the shift. Transfers are not modeled. |
 
 ## How it works
 
-The AI reads and writes text. It never decides who can get to work; the bus schedules do.
+> **Granite reads the posting. The schedules decide.**
 
-| Step | What does it | AI? |
+The AI handles language. Reachability and household totals come from explicit rules applied to public transit schedules and Census data.
+
+```mermaid
+flowchart LR
+    A[Job posting] --> B[IBM Granite<br/>Extract shift details]
+    B --> C[Census Geocoder<br/>Locate workplace]
+    C --> D[Deterministic engine<br/>Check both journeys]
+    E[DDOT + SMART<br/>GTFS schedules] --> D
+    F[Census tracts + ACS<br/>Car-free households] --> D
+    D --> G[Interactive map<br/>Shift comparisons]
+    D --> H[Granite memo<br/>Number check + fallback]
+
+    classDef ai fill:#eaf1ff,stroke:#0f62fe,color:#0f1b2a
+    classDef rules fill:#e7f5ed,stroke:#1a9850,color:#0f1b2a
+    classDef data fill:#f3f5f8,stroke:#8090a0,color:#0f1b2a
+    class B,H ai
+    class D,G rules
+    class A,C,E,F data
+```
+
+| Layer | Built with | Responsibility |
 |---|---|---|
-| Read the posting (address, shift start and end, days, notes) | **IBM Granite** on **watsonx.ai** | Yes |
-| Turn the address into coordinates | U.S. Census Geocoder | No |
-| Find bus stops within a half-mile walk of the site and every scheduled trip through them | Python (pandas) over the DDOT and SMART schedules | No |
-| For each census tract: is there a bus before the shift, and a bus home after? | Fixed rules, listed below | No |
-| Weight each tract by its car-free households | Census ACS table B25044 | No |
-| Write the employer memo from the computed facts | **IBM Granite**, then a number checker | Yes, checked |
+| Language | IBM Granite on watsonx.ai | Parse messy postings and draft the memo. |
+| Analysis | Python, pandas, NumPy | Evaluate scheduled journeys and aggregate car-free households. |
+| API | FastAPI | Serve extraction, geocoding, reachability, and memo endpoints. |
+| Interface | JavaScript, Leaflet, Esri basemap | Show tract coverage, last-bus timing, and instant shift comparisons. |
+| Public data | DDOT, SMART, U.S. Census Bureau | Supply schedules, boundaries, and ACS B25044 household estimates. |
 
-**The rules** (set in `app/config.py`):
+### Rules you can inspect
 
-- Walk at most 800 m (about half a mile) at each end, at roughly 3 mph with a 1.3 street-detour factor.
-- Arrive between 5 and 60 minutes before the shift starts.
-- A bus home must leave within 45 minutes of the shift ending.
-- One-seat rides only, 90 minutes at most. **Transfers are not modeled yet**, so results are conservative.
+Defaults live in [`app/config.py`](app/config.py): stops within **800 m** at each end; estimated walking time at about **3 mph** with a **1.3× detour factor**; arrival **5–60 minutes before** the shift; a return departure within **45 minutes after** it ends; and a **90-minute maximum modeled one-seat journey**.
 
-**Size of the real data build:** 10,541 bus stops, 82 routes, 1,218 census tracts (739 with a stop
-in walking distance) and about 130,800 car-free households.
+The documented demo build contains **10,541 stops**, **82 routes**, and **1,218 census tracts**, representing about **130,800 car-free households**. Of those tracts, **739** have a stop within walking distance. These describe the demo build; a fresh data download may differ.
 
-## Run it yourself
+## Run locally
 
-Requires Python 3.10 or newer, an IBM watsonx.ai API key and project ID, and a free Census API key.
+You need **Git, Python 3.10+**, an **IBM watsonx.ai API key and project ID** for the default Granite provider, and a **[free Census API key](https://api.census.gov/data/key_signup.html)** to fetch the ACS data.
 
-Windows (PowerShell):
+<details open>
+<summary><strong>Windows · PowerShell</strong></summary>
 
 ```powershell
+git clone https://github.com/CosmonautJones/last-bus-out.git
+Set-Location last-bus-out
 python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-copy .env.example .env          # then add your watsonx.ai key, project ID and Census key
-.venv\Scripts\python scripts\fetch_data.py
-.venv\Scripts\python scripts\build_index.py
-.venv\Scripts\uvicorn app.main:app --port 8000      # open http://localhost:8000
-.venv\Scripts\python -m pytest -q tests
+.\.venv\Scripts\python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+New-Item -ItemType Directory -Force data/raw | Out-Null
 ```
 
-macOS / Linux:
+**Before continuing:** fill in `.env` with `WATSONX_API_KEY`, `WATSONX_PROJECT_ID`, and `CENSUS_API_KEY`. Download the [DDOT GTFS ZIP](https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip) in a browser and save it as `data/raw/ddot_gtfs.zip` for full DDOT + SMART coverage.
+
+```powershell
+.\.venv\Scripts\python scripts\fetch_data.py
+.\.venv\Scripts\python scripts\build_index.py
+.\.venv\Scripts\python -m uvicorn app.main:app --port 8000
+```
+
+Open **[localhost:8000](http://localhost:8000)**. In another PowerShell terminal, from the repository directory:
+
+```powershell
+.\.venv\Scripts\python -m pytest -q tests
+```
+
+</details>
+
+<details>
+<summary><strong>macOS / Linux · Bash</strong></summary>
 
 ```bash
-make setup && cp .env.example .env    # add your keys to .env (never commit it)
-make data                             # downloads the public data and builds data/build/
-make run                              # http://localhost:8000
-make test
+git clone https://github.com/CosmonautJones/last-bus-out.git
+cd last-bus-out
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+cp .env.example .env
+mkdir -p data/raw
 ```
 
-The city's DDOT download blocks scripts. To use the newest DDOT schedule, download
-`ddot_gtfs.zip` from the City of Detroit in a browser, save it as `data/raw/ddot_gtfs.zip`,
-and run `build_index.py` again. `fetch_data.py` never overwrites a file that is already there.
+Fill in `.env` with `WATSONX_API_KEY`, `WATSONX_PROJECT_ID`, and `CENSUS_API_KEY`. Download the [DDOT GTFS ZIP](https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip) in a browser and save it as `data/raw/ddot_gtfs.zip`.
 
-No watsonx.ai access? Set `LBO_LLM_PROVIDER=ollama` to run Granite's open weights locally, or
-`mock` for a regex fallback that the UI clearly labels as "not Granite".
+```bash
+.venv/bin/python scripts/fetch_data.py
+.venv/bin/python scripts/build_index.py
+.venv/bin/python -m uvicorn app.main:app --port 8000
+```
 
-## Project layout
+Open **[localhost:8000](http://localhost:8000)**. In another terminal, from the repository directory:
 
-| Path | What it is |
+```bash
+.venv/bin/python -m pytest -q tests
+```
+
+</details>
+
+<details>
+<summary><strong>Alternative providers and troubleshooting</strong></summary>
+
+| Need | What to do |
 |---|---|
-| `app/main.py` | FastAPI server and JSON API |
-| `app/engine.py` | The deterministic reachability engine |
-| `app/granite.py` | Granite calls: posting extraction, memo, number checker |
-| `app/geocode.py` | U.S. Census Geocoder client |
-| `scripts/fetch_data.py`, `scripts/build_index.py` | Download the public data and build the index |
-| `scripts/record_demo.py` | Optional: records the captioned demo video with Playwright |
-| `web/` | The one-page interface (Leaflet map) |
-| `samples/postings.json` | Three fictional job postings |
-| `tests/` | Tests on a small synthetic bus network (no internet needed) |
-| `data/SOURCES.md` | Every data source and its terms |
-| `HACKATHON.md`, `BOB_PLAYBOOK.md`, `bob_usage/` | Submission kit and IBM Bob usage evidence |
+| Run Granite locally | Install and start Ollama, run `ollama pull granite3.3:8b`, then set `LBO_LLM_PROVIDER=ollama` in `.env`. |
+| Try without model credentials | Set `LBO_LLM_PROVIDER=mock`. The regex fallback is visibly labeled **“not Granite.”** |
+| Census download fails | Set `CENSUS_API_KEY`. The current fetch script requires it, even though the example environment file calls it optional. |
+| DDOT is missing | Download its ZIP in a browser. The city portal blocks automated downloads; the fetch script does not retrieve it. An index can build with SMART alone, so check the build output and page footer. |
+| Data was downloaded but the app says it is missing | Run `scripts/build_index.py` with the virtual environment's Python, then restart the server. |
+| Refresh a feed | Back up and replace the relevant file in `data/raw/`, rebuild the index, and restart the server. The fetch script skips existing downloads. |
 
-## Data sources
+Both alternative providers still need built transit/Census data. Geocoding and basemap tiles also use network services. Never commit `.env`; credentials belong only in your local environment.
 
-All public; details and links are in `data/SOURCES.md`.
+The tests use a small synthetic bus network and need no API keys or internet after dependencies are installed. They cover round trips, late shifts, arrival windows, overnight times, schedule interpolation, memo number checking, and the mock parser.
 
-- DDOT bus schedule (GTFS), City of Detroit
-- SMART bus schedule (GTFS), Suburban Mobility Authority for Regional Transportation
-- U.S. Census Bureau ACS 5-year table B25044 (vehicles available by household), tracts in Wayne, Oakland and Macomb
-- U.S. Census Bureau tract boundaries and Geocoder
+</details>
 
-The sample job postings are **fictional**. No personal information is collected or stored.
+## Built for the hackathon
 
-## Tools used (required disclosure)
+| Tool | Contribution |
+|---|---|
+| **IBM Bob IDE** | Core build tool: real-data pipeline work, Granite integration, Windows and basemap fixes. See the [Bob playbook](BOB_PLAYBOOK.md) and [usage evidence](bob_usage/). |
+| **IBM watsonx.ai + IBM Granite** | `ibm/granite-4-h-small` reads postings and drafts employer memos. |
+| **Claude · Anthropic** | Research, initial scaffold, interface polish, original documentation, and demo recording script. |
+| **OpenAI Codex** | README presentation, documentation graphics, and setup-instruction review. |
+| **IBM Code Engine** | Optional deployment target via [`Dockerfile`](Dockerfile); **not deployed for the demo**. |
 
-- **IBM Bob IDE**: core build tool. Bob ran and fixed the real-data pipeline, wired and verified
-  Granite on watsonx.ai, and made the Windows and basemap fixes (see `BOB_PLAYBOOK.md` and `bob_usage/`).
-- **IBM watsonx.ai + IBM Granite** (`ibm/granite-4-h-small`): posting extraction and the employer memo.
-- **Claude (Anthropic)**: research, the initial scaffold, the front-end polish in v0.1.2 and later
-  (shift switch, last-bus line, styling), this README and the demo recording script.
-- **IBM Code Engine**: optional deployment target (`Dockerfile`); not deployed for the demo.
-- Leaflet with the Esri World Light Gray basemap.
-- No Google tools were used.
+No Google tools were used. The [submission overview](SUBMISSION.md), [hackathon kit](HACKATHON.md), and [Bob usage evidence](bob_usage/) document the entry. The demo can be recorded with [`scripts/record_demo.py`](scripts/record_demo.py), an optional Playwright tool.
 
-## Limitations
+## Data, assumptions, and limits
 
-- **Scheduled times, not live arrivals.** DDOT's weekday afternoon on-time rate was about two-thirds
-  in 2025, so treat tight margins as risky.
-- **The DDOT schedule in the demo is from July 2026**, the newest copy that could be downloaded
-  automatically. The SMART schedule is current (November 2026). The page footer shows both dates.
-- **One-seat rides only.** A tract shown as grey may still be reachable with a transfer.
-- **The memo's numbers are checked exactly; its wording only partly.** Two known misleading phrasings
-  are caught and replaced with the template, but the map and the counts beside it are the source of truth.
-- Tract centers approximate where people live, and Census estimates have margins of error.
-- Weekend results use one representative Saturday and Sunday from each feed.
+All analytical inputs are public: **DDOT and SMART GTFS schedules**, **Census ACS five-year table B25044**, **Census tract boundaries**, and the **Census Geocoder**. [Every source and its terms →](data/SOURCES.md)
+
+- **Scheduled service, not live arrivals.** Tight connections may fail in practice. This is a planning tool, not a guarantee of a ride.
+- **Demo feed dates:** DDOT July 2026 and SMART November 2026. The app footer reports the loaded data; refreshed feeds may produce different results.
+- **One-seat rides only.** Transfers are not modeled, so some trips the model cannot find may still be possible.
+- **Households, not people or hires.** Tract representative points approximate where people live, and Census estimates have margins of error.
+- **Representative service days.** Weekday, Saturday, and Sunday calculations use representative dates from each feed, not every possible calendar exception.
+- **Memo validation has limits.** Numbers are checked against computed facts; wording is only partly checked. The map and computed counts are the source of truth.
+
+The sample job postings are **fictional**. The app does not collect or store personal profiles.
+
+## Explore the code
+
+| Start here | What you will find |
+|---|---|
+| [`app/engine.py`](app/engine.py) | Deterministic reachability and household totals. |
+| [`app/granite.py`](app/granite.py) | Posting extraction, memo generation, and number validation. |
+| [`app/main.py`](app/main.py) · [`app/geocode.py`](app/geocode.py) | FastAPI endpoints and Census geocoding. |
+| [`scripts/fetch_data.py`](scripts/fetch_data.py) · [`scripts/build_index.py`](scripts/build_index.py) | Public-data downloads and index construction. |
+| [`web/`](web/) | The single-page Leaflet interface. |
+| [`samples/postings.json`](samples/postings.json) · [`tests/`](tests/) | Fictional postings and synthetic-network tests. |
+
+**Next steps:** transfers between routes, route-level reliability, a workforce-board comparison view, and SMS summaries for job seekers. These are ideas for a future iteration, not current features.
+
+---
+
+<p align="center"><strong>A job is only reachable if you can get home.</strong><br><a href="https://youtu.be/d1puFY888es">Watch Last Bus Out in action ↗</a></p>
