@@ -15,6 +15,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+# Load .env if present so the script works without manually exporting vars
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.config import (BUILD_DIR, COUNTY_FIPS, MAX_WALK_M, RAW_DIR,  # noqa: E402
                         STATE_FIPS, WALK_DETOUR, WALK_SPEED_MPS)
@@ -118,7 +125,7 @@ def read_tracts(raw_dir: Path) -> pd.DataFrame:
         z = raw_dir / "mi_tracts.zip"
         if not z.exists():
             raise FileNotFoundError("data/raw/mi_tracts.zip missing; run scripts/fetch_data.py")
-        with tempfile.TemporaryDirectory() as td:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
             zipfile.ZipFile(z).extractall(td)
             shp = next(Path(td).glob("*.shp"))
             r = shapefile.Reader(str(shp))
@@ -126,6 +133,7 @@ def read_tracts(raw_dir: Path) -> pd.DataFrame:
             for sr in r.iterShapeRecords():
                 props = dict(zip(fields, sr.record))
                 feats.append((props, shape(sr.shape.__geo_interface__)))
+            r.close()  # release file handles before temp dir cleanup (needed on Windows)
     rows = []
     for props, geom in feats:
         if str(props.get("STATEFP", STATE_FIPS)) != STATE_FIPS or str(props.get("COUNTYFP")) not in COUNTY_FIPS:

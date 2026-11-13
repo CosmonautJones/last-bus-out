@@ -2,6 +2,12 @@
 import os
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
+
 ROOT = Path(__file__).resolve().parent.parent
 VERSION = (ROOT / "VERSION").read_text().strip()
 
@@ -30,7 +36,7 @@ WATSONX_URL = os.getenv("WATSONX_URL", "https://us-south.ml.cloud.ibm.com")
 WATSONX_API_KEY = os.getenv("WATSONX_API_KEY", "")
 WATSONX_PROJECT_ID = os.getenv("WATSONX_PROJECT_ID", "")
 # Check Prompt Lab for the exact Granite model IDs available in the hackathon account.
-GRANITE_MODEL_ID = os.getenv("GRANITE_MODEL_ID", "ibm/granite-3-3-8b-instruct")
+GRANITE_MODEL_ID = os.getenv("GRANITE_MODEL_ID", "ibm/granite-4-h-small")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "granite3.3:8b")
 LLM_TIMEOUT_S = float(os.getenv("LBO_LLM_TIMEOUT_S", "30"))

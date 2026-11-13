@@ -15,14 +15,26 @@ from pathlib import Path
 
 import httpx
 
+# Load .env if present so the script works without manually exporting vars
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from app.config import COUNTY_FIPS, RAW_DIR, STATE_FIPS  # noqa: E402
 
 ACS_YEAR = os.getenv("LBO_ACS_YEAR", "2023")
 TIGER_YEAR = os.getenv("LBO_TIGER_YEAR", "2023")
 
+# DDOT: city portal (detroitmi.gov) blocks automated downloads with 403.
+# Primary fallback is the MobilityDatabase GCS hosted copy (MDB source ID 464, public).
 DOWNLOADS = {
-    "ddot_gtfs.zip": "https://www.detroitmi.gov/Portals/0/docs/deptoftransportation/pdfs/ddot_gtfs.zip",
+    "ddot_gtfs.zip": (
+        "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/"
+        "us-michigan-detroit-department-of-transportation-ddot-gtfs-464.zip?alt=media"
+    ),
     "smart_gtfs.zip": "https://apps1.smartbus.org/gtfs/smart_gtfs.zip",
     "mi_tracts.zip": f"https://www2.census.gov/geo/tiger/GENZ{TIGER_YEAR}/shp/cb_{TIGER_YEAR}_{STATE_FIPS}_tract_500k.zip",
 }
@@ -49,15 +61,25 @@ def fetch_acs() -> None:
         print("  skip acs_b25044.json (already downloaded)")
         return
     rows = []
-    key = os.getenv("CENSUS_API_KEY", "")  # optional; small queries work without one
+    key = os.getenv("CENSUS_API_KEY", "")
+    if not key:
+        raise RuntimeError(
+            "CENSUS_API_KEY is not set. The Census API now requires a key.\n"
+            "  Get a free key at https://api.census.gov/data/key_signup.html\n"
+            "  Then add  CENSUS_API_KEY=<your_key>  to your .env file."
+        )
     for county in COUNTY_FIPS:
         url = (f"https://api.census.gov/data/{ACS_YEAR}/acs/acs5"
                f"?get=NAME,B25044_001E,B25044_003E,B25044_010E"
-               f"&for=tract:*&in=state:{STATE_FIPS}%20county:{county}")
-        if key:
-            url += f"&key={key}"
+               f"&for=tract:*&in=state:{STATE_FIPS}%20county:{county}"
+               f"&key={key}")
         print(f"  get  ACS {ACS_YEAR} B25044 county {county}")
-        r = httpx.get(url, timeout=60)
+        r = httpx.get(url, timeout=60, follow_redirects=False)
+        if r.status_code == 302:
+            raise RuntimeError(
+                f"Census API redirected (likely bad API key). "
+                f"Location: {r.headers.get('location', '?')}"
+            )
         r.raise_for_status()
         data = r.json()
         header, body = data[0], data[1:]
@@ -77,5 +99,6 @@ if __name__ == "__main__":
     try:
         fetch_acs()
     except Exception as e:
-        print(f"  FAILED ACS: {e}")
+        print(f"  FAILED ACS: {e}", flush=True)
+        raise SystemExit(1)
     print("Done. Next: python scripts/build_index.py")
